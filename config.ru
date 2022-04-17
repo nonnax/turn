@@ -3,7 +3,6 @@
 require './lib/turn'
 
 App=Turn.new do
-  define do
     on '/' do
       get do
         res.write 'hello'
@@ -31,8 +30,6 @@ App=Turn.new do
     def default
       res.redirect '/greet'
     end
-  end
 end
-
 
 run App

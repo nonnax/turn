@@ -11,7 +11,7 @@ class Turn
     @req=Rack::Request.new(env)
     @res=Rack::Response.new
     catch(:halt) do
-      instance_eval(&@block)
+      define{ instance_eval(&@block) }
       default unless @matched
       res.finish
     end

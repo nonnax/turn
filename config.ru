@@ -12,6 +12,9 @@ App=Turn.new do
       get do |params|
         res.write "greetings! #{params}"
       end
+      post do |params|
+        res.write "posting! #{params}"
+      end
     end
     on '/greet/:me' do
       get do 

@@ -39,9 +39,9 @@ class Turn
     @matched=false
     yield
   end
-  def run    
-    r=yield
-    @matched=true if r
+  def run
+    @matched=true
+    yield    
   end
   def halt(res)
     throw :halt, res

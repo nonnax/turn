@@ -24,6 +24,13 @@ App=Turn.new do
         res.write "hey you too! #{me}, #{too} + #{req.params}" 
       end
     end
+    on '/red' do
+      res.redirect '/greet/hey'
+    end
+    # custom 404 handler
+    def default
+      res.redirect '/greet'
+    end
   end
 end
 

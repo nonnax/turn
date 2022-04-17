@@ -6,34 +6,49 @@ class Turn
     @block=block
     @inbox={}
   end
-  def call(env)
+  def _call(env)
     @req=Rack::Request.new(env)
     @res=Rack::Response.new
-    instance_eval(&@block)
-    res.finish
+    catch(:halt) do
+      res.status=200
+      instance_eval(&@block)
+      default unless @matched
+      res.finish
+    end
+  end
+  def call(env)
+    dup._call(env)
   end
   def on path
     mdata=req.path_info.match(matcher(path))
     run{ @inbox=@slugs.zip(mdata&.captures || []).to_h; yield inbox.values } if mdata
   end
   def get
-    run{ res.status=202; yield inbox.values+req.params.values } if req.get?
+    run{ yield inbox.values+req.params.values } if req.get?
   end
   def post
-    run{ res.status=202; yield inbox.values+req.params.values } if req.post?
+    run{ yield inbox.values+req.params.values } if req.post?
   end
   def put
-    run{ res.status=202; yield inbox.values+req.params.values } if req.put?
+    run{ yield inbox.values+req.params.values } if req.put?
   end
   def delete
-    run{ res.status=202; yield inbox.values+req.params.values } if req.delete?
+    run{ yield inbox.values+req.params.values } if req.delete?
   end
   def define
-    res.status=404
+    @matched=false
     yield
   end
-  def run
-    yield
+  def run    
+    r=yield
+    @matched=true if r
+  end
+  def halt(res)
+    throw :halt, res
+  end
+  def default
+    res.status=404
+    res.write 'Not Found'
   end
   def matcher(p)
     @slugs = []

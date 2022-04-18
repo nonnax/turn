@@ -6,36 +6,37 @@ require './lib/turn'
 App=Turn.new do
     on '/' do
       get do
-        res.write 'GET'
+        res.write 'GET /'
+      end
+      post do 
+        res.write 'POST /'
       end
     end
-    
-    on '/greet' do 
-      get do |params| # ?name=X
-        res.write "greetings! #{params}"
-      end
-      post do |params|
-        res.write "post! #{params}"
-      end
-    end
-    
-    on '/greet/:me' do |name| # captured slug passed to the block
-      get do |name, params|   # captured slug + params, for http verbs
-        res.write "hey you! #{name} + #{params}" 
-      end
-    end
-    
-    on '/greet/:me/:too' do 
-      get do 
-        # captured slugs go to the inbox
-        res.write "hey you too! #{inbox} + #{req.params}" 
-      end
-    end
-    
+
     on '/red' do
-      res.redirect '/greet/hey'
+      res.redirect '/erb/turn'
     end
-    
+
+    on '/greet/:me' do |me| # block args, path slugs 
+      get do 
+       # auto content type as html
+        res.html "get: #{me} + #{req.params}" 
+      end
+      post do 
+        res.write "post: #{me} + #{req.params}" 
+      end
+    end
+
+    on '/erb/:name' do 
+      get do |name, params| # local block args, path slugs & req.params
+        res.erb "hey <%=name%>, + <%=params%> = <%=inbox%>", 
+         inbox:,
+         name:, 
+         params:, 
+         layout: '{ <%=yield%> }'
+      end
+    end
+
     # custom 404 handler
     def default
       res.redirect '/greet'

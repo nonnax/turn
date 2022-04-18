@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 # Id$ nonnax 2022-04-18 16:59:42 +0800
 class Turn
+  # thin wrapper for write method
   class Response < Rack::Response
     def json(s)
       self.headers[Rack::CONTENT_TYPE]='application/json'

@@ -19,8 +19,8 @@ class Turn
   def call(env) dup._call(env) end
   
   def on path
-    matched=req.path_info.match(_matcher path)
-    run{ @inbox=@slugs.zip(Array(matched&.captures)).to_h; yield inbox.values } if mdata
+    matched=_matcher(path)
+    run{ yield inbox.values } if matched
   end
 
   def get() run{ yield inbox.values+req.params.values } if req.get? end  
@@ -34,12 +34,17 @@ class Turn
   def default() res.status=404; res.write 'Not Found' end # override as needed
   
   private 
-  def _matcher p
+  def _capture(match)
+    @inbox=@slugs.zip(Array(match&.captures)).to_h
+  end
+  def _matcher path
     @slugs = []
-    pattern = p.dup.gsub(/:\w+/) do |match|
+    path.dup.gsub(/:\w+/) do |match|
       @slugs << match.gsub(':', '').to_sym
       '([^/?#]+)'
     end
-    /^#{pattern}\/?$/
+   .then{|p| /^#{p}\/?$/ }
+   .then{|p| req.path_info.match(p) }
+   .tap{|m| _capture(m) if m }
   end  
 end

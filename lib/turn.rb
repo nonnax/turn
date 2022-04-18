@@ -34,17 +34,12 @@ class Turn
   def default() res.status = 404; res.write 'Not Found' end # override as needed
   
   private 
-  def _capture(match)
-    @inbox=@slugs.zip( Array( match&.captures ) ).to_h
-  end
+  def _capture(match) @inbox=@slugs.zip( Array( match&.captures ) ).to_h end
+  def _regexp(p) /^#{p}\/?$/  end
   def _matcher path
-    @slugs = []
-    path.dup.gsub(/:\w+/) do |match|
-      @slugs << match.gsub(':', '').to_sym
-      '([^/?#]+)'
-    end
-   .then{|p| /^#{p}\/?$/ }
-   .then{|p| req.path_info.match p }
-   .tap{|m| _capture m if m }
+    @slugs = path.scan(/:(\w+)/).flatten.map(&:to_sym)
+    path.gsub(/:\w+/, '([^/?#]+)')
+   .then{|p| req.path_info.match(_regexp p) }
+   .tap{|m| _capture m if m}
   end  
 end

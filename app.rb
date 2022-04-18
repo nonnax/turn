@@ -28,11 +28,13 @@ App=Turn.new do
 
     on '/erb/:name' do 
       get do |name, params| # local block args, path slugs & req.params
-        res.erb "hey <%=name%>, + <%=params%> = <%=inbox%>", 
+        res.erb( "#hey <%=name%>, + query string: <%=params%>, inbox[:name] = <%=inbox[:name]%>", 
+         layout: '{ <%=yield%> }',
          inbox:,
          name:, 
          params:, 
-         layout: '{ <%=yield%> }'
+         markdown: true,   # parse markdown with kramdown, `markdown`|`md`: true or any
+         ) {|s| s.upcase } # kramdown alternative markdown parsing via block. 
       end
     end
 

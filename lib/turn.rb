@@ -19,8 +19,8 @@ class Turn
   def call(env) dup._call(env) end
   
   def on path
-    mdata=req.path_info.match(matcher(path))
-    run{ @inbox=@slugs.zip(mdata&.captures || []).to_h; yield inbox.values } if mdata
+    matched=req.path_info.match(_matcher path)
+    run{ @inbox=@slugs.zip(Array(matched&.captures)).to_h; yield inbox.values } if mdata
   end
 
   def get() run{ yield inbox.values+req.params.values } if req.get? end  
@@ -31,14 +31,15 @@ class Turn
   def define() @matched=false; yield end  # starting point
   def run() @matched=true; yield end
   def halt(res) throw :halt, res end # short-circut 
-  def default() res.status=404; res.write 'Not Found' end
+  def default() res.status=404; res.write 'Not Found' end # override as needed
   
-  def matcher(p)
+  private 
+  def _matcher p
     @slugs = []
-    compiled_path = p.dup.gsub(/:\w+/) do |match|
+    pattern = p.dup.gsub(/:\w+/) do |match|
       @slugs << match.gsub(':', '').to_sym
       '([^/?#]+)'
     end
-    /^#{compiled_path}\/?$/
+    /^#{pattern}\/?$/
   end  
 end

@@ -8,6 +8,7 @@ App=Turn.new do
         res.write 'hello'
       end
     end
+
     on '/greet' do 
       get do |params|
         res.write "greetings! #{params}"
@@ -16,19 +17,23 @@ App=Turn.new do
         res.write "posting! #{params}"
       end
     end
+
     on '/greet/:me' do
       get do 
         res.write "hey you! #{inbox} + #{req.params}" 
       end
     end
+
     on '/greet/:me/:too' do |me, too|
       get do 
         res.write "hey you too! #{me}, #{too} + #{req.params}" 
       end
     end
+
     on '/red' do
       res.redirect '/greet/hey'
     end
+
     # custom 404 handler
     def default
       res.redirect '/greet'

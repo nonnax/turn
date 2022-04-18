@@ -2,6 +2,10 @@
 # Id$ nonnax 2022-04-17 10:57:34 +0800
 require './lib/turn'
 
+# use Rack::Static,
+  # urls: %w[/css /js /img /media],
+  # root: 'public'
+
 App=Turn.new do
     on '/' do
       get do
@@ -18,9 +22,13 @@ App=Turn.new do
       end
     end
 
-    on '/greet/:me' do
-      get do 
-        res.write "hey you! #{inbox} + #{req.params}" 
+    on '/erb/:me' do 
+      get do |name, params|
+        res.erb "hey you! <%=name%> + <%=params%> = <%=inbox%>", 
+         inbox:,
+         name:, 
+         params: 
+         # layout: File.read('views/layout.erb')
       end
     end
 

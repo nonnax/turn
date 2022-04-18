@@ -23,15 +23,15 @@ class Turn
     run{ yield inbox.values } if matched
   end
 
-  def get() run{ yield inbox.values+req.params.values } if req.get? end  
-  def post() run{ yield inbox.values+req.params.values } if req.post? end
-  def put() run{ yield inbox.values+req.params.values } if req.put? end
-  def delete() run{ yield inbox.values+req.params.values } if req.delete? end
+  def get;    run{ yield inbox.values,req.params } if req.get? end  
+  def post;   run{ yield inbox.values,req.params } if req.post? end
+  def put;    run{ yield inbox.values,req.params } if req.put? end
+  def delete; run{ yield inbox.values,req.params } if req.delete? end
 
-  def define() @matched = false; yield end  # starting point
-  def run() @matched = true; yield end
+  def define; @matched = false; yield end  # starting point
+  def run;    @matched = true; yield end
   def halt(res) throw :halt, res end # short-circut 
-  def default() res.status = 404; res.write 'Not Found' end # override as needed
+  def default; res.status = 404; res.write 'Not Found' end # override as needed
   
   private 
 

@@ -15,7 +15,7 @@ class Turn
     def erb(text, b=binding, **locals, &block)
       _render(text, b, **locals )
       .then{|s| 
-         if %i[md markdown].any?{|k|locals.key?(k)}  
+         if (locals.keys.intersection %i[md markdown]).any?
           (block ? block.call(s) : Kramdown::Document.new(s).to_html ) 
          else
           s
